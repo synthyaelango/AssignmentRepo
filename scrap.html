@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Scrap Web Page</title>
+</head>
+<body>
+	<form>
+		<label for="text-box">Website</label>
+		<input type="text" id="websiteId" name="website"><br><br>
+		<label for="text-box">pageURL</label>
+		<input type="text" id="pageURLId" name="pageURL"><br><br>
+		<button type="button" id="load-data" style="margin-bottom:10px;" onclick="submitForm()">Scrap</button>
+	</form>
+	
+	<style>
+  table {
+  border: 1px solid blue;
+  border-collapse: collapse;
+  width: 100%;
+  padding : 10px;
+}
+
+th {
+  color : white;
+  background : #1a8cff;
+  height : 30px;
+}
+
+td {
+padding : 10px;
+vertical-align: top;
+}
+
+  </style>
+	
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<div id="result"></div>
+	<script>
+	function submitForm() {
+			const url = "http://localhost:5000/scrap";
+			//const data = new FormData();
+			const websiteValue = document.getElementById("websiteId").value;
+			const pageURLValue = document.getElementById("pageURLId").value;
+			scrapUrl=websiteValue+pageURLValue
+			const data = {
+				scrapUrl : scrapUrl
+				};
+			fetch(url, {
+			method: 'POST', body: JSON.stringify(data), headers: {'Accept': 'application/json','Content-Type': 'application/json'}
+			})
+			.then(function(res){ return res.json(); })
+            .then(function(data){ populateTable(data) })		
+			.catch(error => console.error(error));
+			
+			}
+ 
+ function populateTable(data) {
+  var table = document.createElement("table");
+  var headerRow = document.createElement("tr");
+
+  var headerTH = document.createElement("th");
+  headerTH.innerText = "Website";
+  headerRow.appendChild(headerTH);
+  
+  var headerTH = document.createElement("th");
+  headerTH.innerText = "pageUrl";
+  headerRow.appendChild(headerTH);
+  
+  var headerTH = document.createElement("th");
+  headerTH.innerText = "topic";
+  headerRow.appendChild(headerTH);
+  
+  var headerTH = document.createElement("th");
+  headerTH.innerText = "topicId";
+  headerRow.appendChild(headerTH);
+  
+  var headerTH = document.createElement("th");
+  headerTH.innerText = "content";
+  headerRow.appendChild(headerTH);
+  
+  table.appendChild(headerRow);
+
+  // Create table rows and cells
+  
+
+  for (var i = 0; i < data.length; i++) {
+    var keyCnt = 0;
+	var pageUrlVal = data[0].pageUrl;
+    for (var key in data[i]) {
+	if("pageUrl"!=key){
+	if(keyCnt%2==0)
+	{
+	var row = document.createElement("tr");
+	}
+	else
+	{
+	var row = document.createElement("tr");
+	row.style.backgroundColor = "lightgray";
+	}
+	keyCnt=keyCnt+1;
+	var cellWebsite = document.createElement("td");
+		cellWebsite.innerText = "https://www.tachyonsys.com.au";
+		row.appendChild(cellWebsite);
+	var cellpageUrl = document.createElement("td");
+		cellpageUrl.innerText = pageUrlVal;
+		row.appendChild(cellpageUrl);
+	var cellTopicName = document.createElement("td");
+      cellTopicName.innerText = key;
+      row.appendChild(cellTopicName);
+	 var cellTopicId = document.createElement("td");
+      cellTopicId.innerText = "Topic-00"+keyCnt;
+      row.appendChild(cellTopicId);
+    var cellTopicValue = document.createElement("td");
+	const topicValList =  data[i][key];
+	
+	  cellTopicValue.innerText = topicValList.join("\n");
+      row.appendChild(cellTopicValue);
+	  table.appendChild(row);
+	  }
+    }
+    
+  }
+
+  document.body.appendChild(table);
+			
+		
+}
+	</script>
+	
+</body>
+</html>
